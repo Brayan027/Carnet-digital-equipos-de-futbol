@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Buscar y Descargar Carnet Oficial de Jugador</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- AlertifyJS CSS -->
+    <link rel="stylesheet" href="css/alertify.min.css">
+    <link rel="stylesheet" href="css/alertify-default.min.css">
+    <link rel="stylesheet" href="css/app.css">
+    <script src="js/alertify.min.js"></script>
+    <script src="js/alertify-config.js"></script>
+    <script src="js/html2canvas.min.js"></script>
+    <script src="js/carnet-downloader.js"></script>
+</head>
+<body class="bg-slate-100/60 text-slate-900 min-h-screen flex flex-col justify-between font-sans selection:bg-emerald-500">
+
+    <!-- CABECERA PRINCIPAL -->
+    <header class="bg-white border-b border-slate-200/80 pt-5 pb-5 px-4 text-center shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
+        <div class="max-w-md mx-auto flex items-center justify-between mb-3">
+            <a href="/" class="text-xs text-slate-500 hover:text-slate-900 flex items-center gap-1 font-bold transition">
+                ← Volver al panel
+            </a>
+            <a href="/registro.html" class="text-xs text-emerald-800 font-extrabold bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-full border border-emerald-200 transition">
+                + Inscribirme
+            </a>
+        </div>
+
+        <div class="max-w-md mx-auto">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-900 text-white text-2xl shadow-md shadow-slate-900/10 mb-2">
+                🪪
+            </div>
+            <h1 id="trnNameTitle" class="text-lg font-black uppercase tracking-wider text-slate-900">TORNEO DE FÚTBOL</h1>
+            <p class="text-xs text-emerald-700 font-extrabold tracking-wide mt-0.5">BUSCADOR Y DESCARGA OFICIAL DE CARNETS</p>
+        </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL: BARRA DE BÚSQUEDA Y RESULTADOS -->
+    <main class="flex-1 max-w-md w-full mx-auto px-4 py-6 space-y-5">
+        
+        <!-- CAJA DE BÚSQUEDA ELEGANTE -->
+        <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-5 border border-slate-200/90 space-y-3">
+            <label for="searchInput" class="block text-xs font-black text-slate-800 uppercase tracking-wide">
+                Ingresa tu Cédula, DNI o Nombre Completo
+            </label>
+            
+            <div class="relative flex items-center">
+                <div class="absolute left-3.5 text-slate-400 pointer-events-none text-base">
+                    🔍
+                </div>
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="Ej. 1045234567 o Manuel..." 
+                    class="w-full pl-10 pr-20 py-3.5 border-2 border-slate-200 focus:border-slate-900 rounded-2xl text-sm font-bold text-slate-900 placeholder:text-slate-400 placeholder:font-normal focus:outline-none transition shadow-sm"
+                    autocomplete="off"
+                    autofocus
+                >
+                <button 
+                    type="button" 
+                    id="btnSearch" 
+                    class="absolute right-2 bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition shadow-sm"
+                >
+                    Buscar
+                </button>
+            </div>
+
+            <div class="flex items-center justify-between text-[11px] text-slate-400 px-1">
+                <span>⚡ Búsqueda inmediata oficial</span>
+                <button type="button" id="btnClearSearch" class="text-slate-500 hover:text-slate-800 font-semibold hidden">
+                    Limpiar ✕
+                </button>
+            </div>
+        </div>
+
+        <!-- ESTADO: BUSCANDO (SPINNER) -->
+        <div id="searchLoadingBox" class="hidden bg-white border border-slate-200 rounded-3xl p-8 text-center space-y-3 shadow-md animate-fadeIn">
+            <div class="text-3xl animate-spin inline-block">⚽</div>
+            <p class="text-xs text-slate-600 font-bold">Buscando jugador en la base de datos oficial...</p>
+        </div>
+
+        <!-- ESTADO: INICIAL / INSTRUCCIONES -->
+        <div id="searchInitialState" class="bg-white/80 rounded-3xl p-6 text-center space-y-2 border border-slate-200/80">
+            <div class="text-3xl">🔎</div>
+            <h3 class="text-xs font-black text-slate-800 uppercase tracking-wide">Consulta tu Carnet en Cualquier Momento</h3>
+            <p class="text-[11px] text-slate-500 leading-relaxed max-w-xs mx-auto">
+                Escribe tu número de documento o tu nombre para visualizar tu credencial digital y descargarla al instante en formato JPG de alta definición.
+            </p>
+        </div>
+
+        <!-- ESTADO: SIN RESULTADOS -->
+        <div id="searchEmptyState" class="hidden bg-white rounded-3xl p-6 text-center space-y-3 border border-rose-200 shadow-sm animate-fadeIn">
+            <div class="text-3xl">😕</div>
+            <h3 class="text-sm font-black text-slate-900">No se encontraron resultados</h3>
+            <p class="text-xs text-slate-500 leading-relaxed max-w-xs mx-auto">
+                No encontramos ningún jugador registrado con <span id="searchTermHighlight" class="font-bold text-slate-800"></span>.
+            </p>
+            <div class="pt-2 flex flex-col gap-2">
+                <a href="/registro.html" class="inline-block bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow transition">
+                    + Inscribirse en el Torneo
+                </a>
+            </div>
+        </div>
+
+        <!-- ESTADO: MÚLTIPLES COINCIDENCIAS (LISTA DE SELECCIÓN) -->
+        <div id="multiResultsBox" class="hidden space-y-3 animate-fadeIn">
+            <div class="flex items-center justify-between px-1">
+                <h3 class="text-xs font-black uppercase text-slate-700 tracking-wide">
+                    Jugadores encontrados (<span id="resultsCount">0</span>)
+                </h3>
+                <span class="text-[10px] text-slate-400">Toca uno para ver y descargar</span>
+            </div>
+            <div id="resultsList" class="space-y-2.5">
+                <!-- Se inyectan las tarjetas resumidas de los jugadores encontrados -->
+            </div>
+        </div>
+
+        <!-- ESTADO: CARNET INDIVIDUAL SELECCIONADO PARA DESCARGA -->
+        <div id="singleCarnetBox" class="hidden space-y-4 animate-fadeIn">
+            <!-- Botón para volver al listado si hubo múltiples resultados -->
+            <button type="button" id="btnBackToList" class="hidden text-xs text-slate-500 hover:text-slate-800 font-bold flex items-center gap-1 transition">
+                ← Volver a resultados de búsqueda
+            </button>
+
+            <!-- Tarjeta Oficial del Carnet para Descarga -->
+            <div id="carnetCardPlaceholder" class="w-full">
+                <!-- Se inyecta la tarjeta oficial del carnet -->
+            </div>
+
+            <!-- Botones de Acción de Descarga y Compartir -->
+            <div class="space-y-2">
+                <!-- Botón Principal: Descargar JPG -->
+                <button type="button" id="btnDownloadSingleJpg" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-3.5 px-4 rounded-2xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 active:scale-[0.98] transition">
+                    <span class="text-base">📥</span>
+                    <span>Descargar Carnet (Formato JPG)</span>
+                </button>
+
+                <div class="flex gap-2">
+                    <!-- Botón Ver en Pantalla Completa Digital -->
+                    <a id="btnViewFullDigital" href="#" target="_blank" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-3 rounded-2xl text-xs flex items-center justify-center gap-1.5 shadow-md shadow-slate-900/10 active:scale-[0.98] transition text-center">
+                        <span>👁️</span>
+                        <span>Ver Digital</span>
+                    </a>
+
+                    <!-- Botón Compartir por WhatsApp -->
+                    <a id="btnShareWa" href="#" target="_blank" class="flex-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 font-bold py-3 px-3 rounded-2xl text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-[0.98] transition text-center">
+                        <span>💬</span>
+                        <span>WhatsApp</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- PIE DE PÁGINA -->
+    <footer class="text-center py-4 text-[11px] text-slate-400">
+        Sistema Oficial de Carnetización y Verificación &bull; Torneo de Fútbol
+    </footer>
+
+    <!-- SCRIPT DE BÚSQUEDA Y DESCARGA INMEDIATA -->
+    <script>
+        let searchTimeout = null;
+        let lastQuery = '';
+        let currentSelectedPlayer = null;
+        let currentSearchResults = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Verificar si el sistema está suspendido por falta de pago
+            try {
+                const subRes = await fetch('/api/subscription/status');
+                if (subRes.ok) {
+                    const sub = await subRes.json();
+                    if (sub.is_blocked === 1 && sub.block_mode === 'TOTAL') {
+                        renderSuspendedNotice(sub);
+                        return;
+                    }
+                }
+            } catch (_) {}
+
+            // Cargar nombre del torneo
+            try {
+                const trnRes = await fetch('/api/tournament');
+                if (trnRes.ok) {
+                    const data = await trnRes.json();
+                    if (data.tournament && data.tournament.name) {
+                        document.getElementById('trnNameTitle').textContent = data.tournament.name;
+                    }
+                }
+            } catch (_) {}
+
+            const searchInput = document.getElementById('searchInput');
+            const btnSearch = document.getElementById('btnSearch');
+            const btnClear = document.getElementById('btnClearSearch');
+
+            // Leer parámetro de URL (?q=... o ?cedula=...)
+            const urlParams = new URLSearchParams(window.location.search);
+            const initialQuery = urlParams.get('q') || urlParams.get('cedula') || urlParams.get('doc');
+            if (initialQuery) {
+                searchInput.value = initialQuery;
+                btnClear.classList.remove('hidden');
+                performSearch(initialQuery);
+            }
+
+            // Evento input en tiempo real (con debounce de 350ms)
+            searchInput.addEventListener('input', (e) => {
+                const q = e.target.value.trim();
+                if (q) {
+                    btnClear.classList.remove('hidden');
+                } else {
+                    btnClear.classList.add('hidden');
+                    resetToInitialState();
+                    return;
+                }
+
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    performSearch(q);
+                }, 350);
+            });
+
+            // Enter en el input
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    clearTimeout(searchTimeout);
+                    performSearch(searchInput.value.trim());
+                }
+            });
+
+            // Botón buscar
+            btnSearch.addEventListener('click', () => {
+                clearTimeout(searchTimeout);
+                performSearch(searchInput.value.trim());
+            });
+
+            // Botón limpiar
+            btnClear.addEventListener('click', () => {
+                searchInput.value = '';
+                btnClear.classList.add('hidden');
+                resetToInitialState();
+                searchInput.focus();
+            });
+
+            // Botón volver a la lista de resultados
+            document.getElementById('btnBackToList').addEventListener('click', () => {
+                document.getElementById('singleCarnetBox').classList.add('hidden');
+                document.getElementById('multiResultsBox').classList.remove('hidden');
+            });
+        });
+
+        function resetToInitialState() {
+            document.getElementById('searchLoadingBox').classList.add('hidden');
+            document.getElementById('searchEmptyState').classList.add('hidden');
+            document.getElementById('multiResultsBox').classList.add('hidden');
+            document.getElementById('singleCarnetBox').classList.add('hidden');
+            document.getElementById('searchInitialState').classList.remove('hidden');
+            lastQuery = '';
+            currentSearchResults = [];
+            currentSelectedPlayer = null;
+        }
+
+        async function performSearch(query) {
+            if (!query || query.length < 1) {
+                resetToInitialState();
+                return;
+            }
+
+            lastQuery = query;
+
+            // Mostrar estado de carga
+            document.getElementById('searchInitialState').classList.add('hidden');
+            document.getElementById('searchEmptyState').classList.add('hidden');
+            document.getElementById('multiResultsBox').classList.add('hidden');
+            document.getElementById('singleCarnetBox').classList.add('hidden');
+            document.getElementById('searchLoadingBox').classList.remove('hidden');
+
+            try {
+                const res = await fetch(`/api/players/search-public?q=${encodeURIComponent(query)}`);
+                const data = await res.json();
+                document.getElementById('searchLoadingBox').classList.add('hidden');
+
+                if (!res.ok || !data.success || !data.players || data.players.length === 0) {
+                    document.getElementById('searchTermHighlight').textContent = `"${query}"`;
+                    document.getElementById('searchEmptyState').classList.remove('hidden');
+                    return;
+                }
+
+                currentSearchResults = data.players;
+
+                // Si encontramos exactamente 1 jugador, mostrarlo directamente
+                if (data.players.length === 1) {
+                    showSinglePlayerCarnet(data.players[0], false);
+                } else {
+                    // Múltiples jugadores encontrados
+                    showMultipleResults(data.players);
+                }
+            } catch (err) {
+                document.getElementById('searchLoadingBox').classList.add('hidden');
+                document.getElementById('searchTermHighlight').textContent = `"${query}"`;
+                document.getElementById('searchEmptyState').classList.remove('hidden');
+            }
+        }
+
+        function showMultipleResults(players) {
+            document.getElementById('singleCarnetBox').classList.add('hidden');
+            document.getElementById('searchEmptyState').classList.add('hidden');
+            
+            const countEl = document.getElementById('resultsCount');
+            countEl.textContent = players.length;
+
+            const listEl = document.getElementById('resultsList');
+            listEl.innerHTML = players.map((p, index) => {
+                const photoSrc = p.photo_url || CarnetDownloader.DEFAULT_PHOTO;
+                const statusBadge = p.status === 'VERIFIED'
+                    ? '<span class="text-[9px] bg-emerald-50 text-emerald-700 font-extrabold px-2 py-0.5 rounded-full border border-emerald-200">HABILITADO</span>'
+                    : '<span class="text-[9px] bg-amber-50 text-amber-700 font-extrabold px-2 py-0.5 rounded-full border border-amber-200">EN REVISIÓN</span>';
+
+                return `
+                    <div class="bg-white rounded-2xl p-3.5 border border-slate-200/90 shadow-sm flex items-center justify-between gap-3 hover:border-slate-900 transition">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="w-12 h-14 rounded-xl bg-slate-100 border border-slate-900 overflow-hidden flex-shrink-0 shadow-sm">
+                                <img src="${photoSrc}" class="w-full h-full object-cover" alt="Foto">
+                            </div>
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    <h4 class="text-xs font-black text-slate-900 leading-tight truncate">${escapeHTML(p.full_name)}</h4>
+                                    ${p.dorsal ? `<span class="text-[9px] font-black bg-slate-900 text-white px-1.5 py-0.2 rounded">#${p.dorsal}</span>` : ''}
+                                </div>
+                                <p class="text-[11px] text-slate-500 font-bold truncate mt-0.5">${escapeHTML(p.team_name || 'Sin Equipo')}</p>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="text-[10px] text-slate-400 font-medium">${p.document_type || 'CC'}: <strong>${p.document_number || 'S/N'}</strong></span>
+                                    ${statusBadge}
+                                </div>
+                            </div>
+                        </div>
+
+                        <button 
+                            type="button" 
+                            onclick="selectPlayerFromList(${index})" 
+                            class="flex-shrink-0 bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-black text-xs py-2 px-3 rounded-xl transition shadow-sm flex items-center gap-1"
+                        >
+                            <span>📥 Ver y Descargar</span>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('multiResultsBox').classList.remove('hidden');
+        }
+
+        window.selectPlayerFromList = function(index) {
+            const player = currentSearchResults[index];
+            if (player) {
+                showSinglePlayerCarnet(player, true);
+            }
+        };
+
+        function showSinglePlayerCarnet(p, canGoBackToList = false) {
+            currentSelectedPlayer = p;
+
+            // Control botón volver
+            const btnBack = document.getElementById('btnBackToList');
+            if (canGoBackToList && currentSearchResults.length > 1) {
+                btnBack.classList.remove('hidden');
+            } else {
+                btnBack.classList.add('hidden');
+            }
+
+            // Ocultar listado múltiple
+            document.getElementById('multiResultsBox').classList.add('hidden');
+
+            // Renderizar la tarjeta oficial del carnet
+            const placeholder = document.getElementById('carnetCardPlaceholder');
+            placeholder.innerHTML = CarnetDownloader.renderCardHtml(p, 'searchedCarnetCard');
+
+            // Enlace ver carnet digital
+            const carnetUrl = `${window.location.origin}/carnet.html?token=${encodeURIComponent(p.qr_code_token)}`;
+            document.getElementById('btnViewFullDigital').href = carnetUrl;
+
+            // Enlace compartir por WhatsApp
+            const waText = encodeURIComponent(`¡Hola! Consulta mi Carnet Oficial de Fútbol para ${p.tournament_name || 'el Torneo'} (${p.team_name || 'Sin Equipo'}): ${carnetUrl}`);
+            document.getElementById('btnShareWa').href = `https://wa.me/?text=${waText}`;
+
+            // Configurar botón descargar JPG
+            const btnDownload = document.getElementById('btnDownloadSingleJpg');
+            btnDownload.onclick = async () => {
+                const cardEl = document.getElementById('searchedCarnetCard');
+                const cleanName = (p.full_name || 'Jugador').trim().replace(/\s+/g, '_');
+                const cleanTeam = (p.team_name || 'Torneo').trim().replace(/\s+/g, '_');
+                const filename = `Carnet_${cleanName}_${cleanTeam}.jpg`;
+                await CarnetDownloader.downloadAsJpg(cardEl, filename, btnDownload);
+            };
+
+            // Mostrar caja de carnet único
+            document.getElementById('singleCarnetBox').classList.remove('hidden');
+
+            // Scroll suave hacia el carnet
+            document.getElementById('singleCarnetBox').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+
+        function renderSuspendedNotice(sub) {
+            const cleanPhone = (sub.contact_phone || '').replace(/\D/g, '');
+            const waUrl = cleanPhone ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent('Hola, me comunico para pagar la suscripción del torneo.')}` : null;
+            document.body.innerHTML = `
+                <div class="min-h-screen bg-slate-950 text-white flex flex-col justify-center items-center p-6 text-center">
+                    <div class="max-w-md w-full bg-slate-900 border-2 border-rose-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-4">
+                        <div class="w-16 h-16 rounded-2xl bg-rose-950 border border-rose-600 text-rose-500 flex items-center justify-center text-3xl mx-auto shadow-lg animate-pulse">
+                            🔒
+                        </div>
+                        <span class="inline-block px-3 py-1 rounded-full bg-rose-950 text-rose-300 border border-rose-800 text-[10px] font-black uppercase tracking-wider">
+                            Servicio Suspendido
+                        </span>
+                        <h2 class="text-xl font-black text-white">${escapeHTML(sub.title || 'Suscripción Pendiente de Pago')}</h2>
+                        <p class="text-xs text-slate-300 leading-relaxed">${escapeHTML(sub.message || 'El buscador de carnets se encuentra temporalmente inhabilitado por falta de pago.')}</p>
+                        ${sub.payment_info ? `<div class="p-3 bg-amber-950/40 border border-amber-600/40 rounded-xl text-left text-xs font-mono text-amber-200 whitespace-pre-wrap">${escapeHTML(sub.payment_info)}</div>` : ''}
+                        ${waUrl ? `<a href="${waUrl}" target="_blank" class="block w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs py-3.5 px-4 rounded-xl shadow-lg transition">💬 Contactar por WhatsApp para Reactivación</a>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

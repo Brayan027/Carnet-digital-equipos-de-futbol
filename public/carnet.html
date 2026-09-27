@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Carnet Digital Oficial de Jugador</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- AlertifyJS CSS -->
+    <link rel="stylesheet" href="css/alertify.min.css">
+    <link rel="stylesheet" href="css/alertify-default.min.css">
+    <link rel="stylesheet" href="css/app.css">
+    <script src="js/alertify.min.js"></script>
+    <script src="js/alertify-config.js"></script>
+    <script src="js/image-compressor.js"></script>
+    <script src="js/html2canvas.min.js"></script>
+    <script src="js/carnet-downloader.js"></script>
+</head>
+<body class="bg-slate-100/60 text-slate-900 min-h-screen flex flex-col justify-between p-4 selection:bg-emerald-500 font-sans">
+
+    <!-- CABECERA SUPERIOR -->
+    <header class="max-w-sm w-full mx-auto flex justify-between items-center py-2">
+        <a href="/" class="text-xs text-slate-500 hover:text-slate-900 flex items-center gap-1 font-bold transition">
+            ← Volver
+        </a>
+        <div class="flex items-center gap-2">
+            <a href="/buscar.html" class="text-xs text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 px-3 py-1 rounded-full font-bold flex items-center gap-1 shadow-sm transition">
+                <span>🔍</span>
+                <span>Buscar Carnets</span>
+            </a>
+            <div class="flex items-center gap-1.5 text-[11px] text-emerald-800 font-extrabold bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200 shadow-sm">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>OFICIAL</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- CARNET DIGITAL DEL JUGADOR (MÓVIL ELEGANTE) -->
+    <main class="max-w-sm w-full mx-auto my-auto py-2">
+        <div id="loadingBox" class="bg-white border border-slate-200 rounded-3xl p-8 text-center space-y-3 shadow-xl">
+            <div class="text-4xl animate-bounce">⚽</div>
+            <p class="text-xs text-slate-500 font-medium">Cargando carnet digital...</p>
+        </div>
+
+        <div id="carnetDigitalBox" class="hidden animate-fadeIn">
+            <!-- TARJETA DEL CARNET CON EL DISEÑO DE REFERENCIA EN FONDO BLANCO ELEGANTE -->
+            <div id="carnetCardElement" data-carnet-clone-id="carnetCardElement" class="bg-white text-slate-900 rounded-3xl shadow-xl overflow-hidden border-2 border-slate-900 relative">
+                
+                <!-- Cabecera del Torneo con textura mármol pulida -->
+                <div class="carnet-header !h-14 !px-4">
+                    <div class="carnet-shield !w-8 !h-8">
+                        <svg viewBox="0 0 100 100" fill="none">
+                            <path d="M50 8 L85 22 V55 C85 75 50 92 50 92 C50 92 15 75 15 55 V22 Z" fill="#ffffff" stroke="#0f172a" stroke-width="6"/>
+                            <circle cx="50" cy="50" r="22" fill="#ffffff" stroke="#0f172a" stroke-width="4"/>
+                            <polygon points="50,42 56,46 54,53 46,53 44,46" fill="#0f172a"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div id="cTorneoName" class="carnet-tournament-title !text-base">TORNEO SAN ANTONIO</div>
+                        <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest block -mt-0.5">CREDENCIAL DIGITAL OFICIAL</span>
+                    </div>
+                </div>
+
+                <!-- Estado del Jugador (Habilitado / Pendiente) -->
+                <div id="cStatusStrip" class="bg-emerald-600 text-white text-[11px] font-black uppercase tracking-wider py-1.5 text-center flex items-center justify-center gap-1.5 shadow-sm">
+                    <span>✓</span>
+                    <span id="cStatusText">JUGADOR HABILITADO</span>
+                </div>
+
+                <!-- Contenido Principal: Foto + Información + QR -->
+                <div class="p-5 space-y-4 bg-white">
+                    
+                    <!-- Fila Superior: Foto del Jugador y Datos -->
+                    <div class="flex gap-4 items-center">
+                        <!-- Foto oficial con marco nítido -->
+                        <div class="w-24 h-28 flex-shrink-0 bg-slate-50 border-2 border-slate-900 rounded-2xl overflow-hidden shadow-md relative">
+                            <img id="cPlayerPhoto" class="w-full h-full object-cover" src="" alt="Foto">
+                            <span id="cDorsalBadge" class="absolute bottom-1 right-1 bg-slate-900 text-white text-xs font-black px-2 py-0.5 rounded-lg shadow">
+                                #9
+                            </span>
+                        </div>
+
+                        <!-- Datos del Jugador -->
+                        <div class="flex-1 space-y-2 min-w-0">
+                            <div>
+                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-wide block">EQUIPO</span>
+                                <h3 id="cTeamName" class="text-base font-black text-slate-900 leading-tight truncate">Real Martines</h3>
+                            </div>
+
+                            <div>
+                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-wide block">NOMBRE</span>
+                                <h2 id="cPlayerName" class="text-lg font-black text-slate-900 leading-tight">Manuel Burgos</h2>
+                            </div>
+
+                            <div class="text-[11px] text-slate-500 font-semibold">
+                                <span id="cDocType">CC</span>: <span id="cDocNumber" class="text-slate-800 font-bold">1045234</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Código QR de Validación en Cancha -->
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-center space-y-2.5">
+                        <span class="text-[10px] font-black uppercase tracking-wider text-slate-500 block">
+                            CÓDIGO QR PARA VALIDACIÓN EN CANCHA
+                        </span>
+                        
+                        <div class="w-36 h-36 mx-auto bg-white p-2 border-2 border-slate-900 rounded-2xl shadow-sm flex items-center justify-center">
+                            <img id="cQrImage" class="w-full h-full object-contain" alt="QR Verificación">
+                        </div>
+
+                        <p class="text-[10px] text-slate-500 leading-tight">
+                            El árbitro o veedor escanea este código para comprobar autenticidad y habilitación.
+                        </p>
+                    </div>
+
+                </div>
+
+                <!-- Pie de seguridad -->
+                <div class="bg-slate-50 px-5 py-2.5 border-t border-slate-100 flex justify-between items-center text-[10px] text-slate-500 font-mono">
+                    <span>TOKEN: <strong id="cQrToken" class="text-slate-800 font-bold">QR-SA-001</strong></span>
+                    <span class="text-emerald-700 font-extrabold tracking-wide">DIGITAL PASS</span>
+                </div>
+            </div>
+
+            <!-- Botones de Acción Móvil -->
+            <div class="mt-4 space-y-2">
+                <button type="button" id="btnDownloadCarnetJpg" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-3.5 px-4 rounded-2xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 active:scale-95 transition">
+                    <span class="text-base">📥</span>
+                    <span>Descargar Carnet (Formato JPG)</span>
+                </button>
+                <div class="flex gap-2">
+                    <button type="button" id="btnShareCarnet" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-3 rounded-2xl text-xs flex items-center justify-center gap-1.5 shadow-md shadow-slate-900/10 active:scale-95 transition">
+                        <span>📲</span>
+                        <span>Compartir</span>
+                    </button>
+                    <button type="button" id="btnEditCarnet" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-3 rounded-2xl text-xs flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/10 active:scale-95 transition">
+                        <span>✏️</span>
+                        <span>Editar</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notificación Toast Éxito -->
+        <div id="toastSuccess" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-emerald-600 text-white text-xs font-bold px-4 py-2.5 rounded-2xl shadow-xl flex items-center gap-2 hidden animate-bounce">
+            <span>✅</span>
+            <span id="toastMsg">¡Datos del carnet actualizados con éxito!</span>
+        </div>
+
+        <!-- MODAL EDITAR CARNET -->
+        <div id="modalEditCarnet" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm hidden overflow-y-auto animate-fadeIn">
+            <div class="bg-white rounded-3xl p-6 max-w-sm w-full space-y-4 border border-slate-200 shadow-2xl my-auto">
+                <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-sm">
+                            ✏️
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-black text-slate-900 leading-tight">Editar Datos del Carnet</h3>
+                            <p class="text-[10px] text-slate-500">Actualiza la credencial oficial</p>
+                        </div>
+                    </div>
+                    <button type="button" id="btnCloseEditCarnet" class="text-slate-400 hover:text-slate-800 text-xl font-bold">&times;</button>
+                </div>
+
+                <form id="editCarnetForm" class="space-y-3" enctype="multipart/form-data">
+                    <!-- Preview foto actual + cambiar foto -->
+                    <div class="flex items-center gap-3 p-2.5 bg-slate-50 rounded-2xl border border-slate-200">
+                        <div class="w-14 h-16 rounded-xl bg-slate-200 border-2 border-slate-900 overflow-hidden flex-shrink-0 shadow-sm relative">
+                            <img id="modalEditPhotoPreview" class="w-full h-full object-cover" src="" alt="Foto">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <label class="block text-[10px] font-black uppercase text-slate-700 mb-1">Cambiar Foto Oficial</label>
+                            <input type="file" id="modalEditPhoto" name="photo" accept="image/*" class="w-full text-[10px] text-slate-600 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-slate-900 file:text-white hover:file:bg-slate-800 cursor-pointer">
+                            <p class="text-[9px] text-slate-400 mt-0.5">Opcional: cambiar imagen del carnet</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-black uppercase text-slate-700 mb-1">Nombre Completo *</label>
+                        <input type="text" id="modalEditFullName" name="full_name" required class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900">
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-black uppercase text-slate-700 mb-1">Equipo *</label>
+                        <select id="modalEditTeam" name="team_id" required class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-slate-900">
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[10px] font-black uppercase text-slate-700 mb-1">Dorsal / Camiseta</label>
+                            <input type="text" id="modalEditDorsal" name="dorsal" placeholder="Ej. 10" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-slate-900">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black uppercase text-slate-700 mb-1">Posición</label>
+                            <select id="modalEditPosition" name="position" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs font-semibold bg-white focus:outline-none focus:ring-2 focus:ring-slate-900">
+                                <option value="">(Sin definir)</option>
+                                <option value="Portero">Portero</option>
+                                <option value="Defensa">Defensa</option>
+                                <option value="Mediocampista">Mediocampista</option>
+                                <option value="Delantero">Delantero</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="block text-[10px] font-black uppercase text-slate-700 mb-1">Tipo Doc</label>
+                            <select id="modalEditDocType" name="document_type" class="w-full px-2 py-2 border border-slate-200 rounded-xl text-xs bg-white focus:outline-none focus:ring-2 focus:ring-slate-900">
+                                <option value="CC">CC</option>
+                                <option value="TI">TI</option>
+                                <option value="CE">CE</option>
+                                <option value="PASAPORTE">Pasaporte</option>
+                                <option value="DNI">DNI</option>
+                            </select>
+                        </div>
+                        <div class="col-span-2">
+                            <label class="block text-[10px] font-black uppercase text-slate-700 mb-1">Número de Documento</label>
+                            <input type="text" id="modalEditDocNumber" name="document_number" placeholder="Ej. 1045234..." class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-slate-900">
+                        </div>
+                    </div>
+
+                    <div class="pt-2 flex gap-2 border-t border-slate-100">
+                        <button type="button" id="btnCancelEditCarnet" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 rounded-xl text-xs transition">
+                            Cancelar
+                        </button>
+                        <button type="submit" id="btnSubmitEditCarnet" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1">
+                            <span>💾 Guardar Cambios</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- En caso de no existir -->
+        <div id="errorBox" class="hidden bg-white border border-rose-200 rounded-3xl p-6 text-center space-y-3 shadow-xl">
+            <div class="text-3xl">❌</div>
+            <h3 class="text-sm font-bold text-slate-900">Jugador No Encontrado</h3>
+            <p class="text-xs text-slate-500">Este carnet digital no existe o fue eliminado.</p>
+        </div>
+    </main>
+
+    <footer class="text-center py-2 text-[10px] text-slate-400">
+        Credencial Digital Deportiva Oficial &bull; Torneo de Fútbol
+    </footer>
+
+    <script>
+        const DEFAULT_PHOTO = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23cbd5e1'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E";
+        let currentPlayer = null;
+        let availableTeams = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Verificar si el sistema está suspendido por falta de pago de suscripción
+            try {
+                const subRes = await fetch('/api/subscription/status');
+                if (subRes.ok) {
+                    const sub = await subRes.json();
+                    if (sub.is_blocked === 1 && sub.block_mode === 'TOTAL') {
+                        renderSuspendedNotice(sub);
+                        return;
+                    }
+                }
+            } catch (_) {}
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token') || urlParams.get('id');
+
+            if (!token) {
+                showError();
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/verify/${encodeURIComponent(token)}`);
+                const data = await res.json();
+
+                if (!res.ok || !data.found || !data.player) {
+                    showError();
+                    return;
+                }
+
+                currentPlayer = data.player;
+                renderCarnet(currentPlayer);
+                setupEditModal();
+            } catch (err) {
+                showError();
+            }
+        });
+
+        function renderCarnet(p) {
+            document.getElementById('loadingBox').classList.add('hidden');
+            document.getElementById('carnetDigitalBox').classList.remove('hidden');
+
+            document.getElementById('cTorneoName').textContent = p.tournament_name || 'TORNEO SAN ANTONIO';
+            document.getElementById('cPlayerName').textContent = p.full_name;
+            document.getElementById('cTeamName').textContent = p.team_name || 'Sin Equipo';
+            document.getElementById('cDocType').textContent = p.document_type || 'CC';
+            document.getElementById('cDocNumber').textContent = p.document_number || 'No especificado';
+            document.getElementById('cQrToken').textContent = p.qr_code_token;
+
+            if (p.dorsal) {
+                document.getElementById('cDorsalBadge').textContent = '#' + p.dorsal;
+                document.getElementById('cDorsalBadge').classList.remove('hidden');
+            } else {
+                document.getElementById('cDorsalBadge').classList.add('hidden');
+            }
+
+            if (p.photo_url) {
+                document.getElementById('cPlayerPhoto').src = p.photo_url;
+            } else {
+                document.getElementById('cPlayerPhoto').src = DEFAULT_PHOTO;
+            }
+
+            // QR Code oficial local (ultra-rápido, sin depender de servidores externos)
+            const qrImg = document.getElementById('cQrImage');
+            const verifyUrl = `${window.location.origin}/verificar.html?token=${p.qr_code_token}`;
+            if (p.qr_code_image) {
+                qrImg.src = p.qr_code_image;
+            } else {
+                qrImg.src = `/api/qr?data=${encodeURIComponent(verifyUrl)}`;
+            }
+
+            // Estado
+            const strip = document.getElementById('cStatusStrip');
+            const text = document.getElementById('cStatusText');
+
+            if (p.status === 'VERIFIED') {
+                strip.className = 'bg-emerald-600 text-white text-[11px] font-black uppercase tracking-wider py-1.5 text-center flex items-center justify-center gap-1.5 shadow-sm';
+                text.textContent = 'JUGADOR OFICIAL Y HABILITADO';
+            } else if (p.status === 'PENDING') {
+                strip.className = 'bg-amber-500 text-white text-[11px] font-black uppercase tracking-wider py-1.5 text-center flex items-center justify-center gap-1.5 shadow-sm';
+                text.textContent = '⚠️ EN REVISIÓN (PENDIENTE DE APROBACIÓN)';
+            } else {
+                strip.className = 'bg-rose-600 text-white text-[11px] font-black uppercase tracking-wider py-1.5 text-center flex items-center justify-center gap-1.5 shadow-sm';
+                text.textContent = '❌ RECHAZADO / NO HABILITADO';
+            }
+        }
+
+        // Botón Descargar en formato JPG
+        document.getElementById('btnDownloadCarnetJpg').addEventListener('click', async () => {
+            if (!currentPlayer) return;
+            const card = document.getElementById('carnetCardElement');
+            const cleanName = (currentPlayer.full_name || 'Jugador').trim().replace(/\s+/g, '_');
+            const cleanTeam = (currentPlayer.team_name || 'Torneo').trim().replace(/\s+/g, '_');
+            const filename = `Carnet_${cleanName}_${cleanTeam}.jpg`;
+            const btn = document.getElementById('btnDownloadCarnetJpg');
+            await CarnetDownloader.downloadAsJpg(card, filename, btn);
+        });
+
+        // Botón compartir
+        document.getElementById('btnShareCarnet').addEventListener('click', () => {
+            if (!currentPlayer) return;
+            if (navigator.share) {
+                navigator.share({
+                    title: `Carnet Digital - ${currentPlayer.full_name}`,
+                    text: `Carnet Oficial de ${currentPlayer.full_name} (${currentPlayer.team_name || 'Sin Equipo'}) en el ${currentPlayer.tournament_name || 'Torneo'}`,
+                    url: window.location.href
+                }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                showToast('¡Enlace del carnet digital copiado!');
+            }
+        });
+
+        // Configuración del modal de edición
+        async function setupEditModal() {
+            // Cargar equipos
+            try {
+                const res = await fetch('/api/teams');
+                const data = await res.json();
+                availableTeams = data.teams || [];
+            } catch (e) {
+                console.error('Error cargando equipos:', e);
+            }
+
+            const modal = document.getElementById('modalEditCarnet');
+            const btnOpen = document.getElementById('btnEditCarnet');
+            const btnClose = document.getElementById('btnCloseEditCarnet');
+            const btnCancel = document.getElementById('btnCancelEditCarnet');
+            const form = document.getElementById('editCarnetForm');
+            const photoInput = document.getElementById('modalEditPhoto');
+            const photoPreview = document.getElementById('modalEditPhotoPreview');
+            let compressedEditPhoto = null;
+
+            btnOpen.addEventListener('click', () => {
+                if (!currentPlayer) return;
+
+                // Poblar select de equipos
+                const selectTeam = document.getElementById('modalEditTeam');
+                selectTeam.innerHTML = `<option value="">(Sin Equipo)</option>` +
+                    availableTeams.map(t => `<option value="${t.id}" ${t.name === currentPlayer.team_name ? 'selected' : ''}>${t.name}</option>`).join('');
+
+                // Rellenar campos
+                document.getElementById('modalEditFullName').value = currentPlayer.full_name || '';
+                document.getElementById('modalEditDorsal').value = currentPlayer.dorsal || '';
+                document.getElementById('modalEditPosition').value = currentPlayer.position || '';
+                document.getElementById('modalEditDocType').value = currentPlayer.document_type || 'CC';
+                document.getElementById('modalEditDocNumber').value = currentPlayer.document_number || '';
+                photoPreview.src = currentPlayer.photo_url || DEFAULT_PHOTO;
+                photoInput.value = '';
+                compressedEditPhoto = null;
+
+                modal.classList.remove('hidden');
+            });
+
+            const hideModal = () => modal.classList.add('hidden');
+            btnClose.addEventListener('click', hideModal);
+            btnCancel.addEventListener('click', hideModal);
+
+            // Vista previa y pre-renderizado/compresión de nueva foto
+            photoInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    photoPreview.src = URL.createObjectURL(file);
+                    try {
+                        compressedEditPhoto = await ImageCompressor.compress(file, {
+                            maxWidth: 700,
+                            maxHeight: 850,
+                            quality: 0.82
+                        });
+                        photoPreview.src = URL.createObjectURL(compressedEditPhoto);
+                    } catch (err) {
+                        compressedEditPhoto = file;
+                    }
+                }
+            });
+
+            // Enviar edición
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (!currentPlayer) return;
+
+                const submitBtn = document.getElementById('btnSubmitEditCarnet');
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Guardando...';
+
+                try {
+                    const formData = new FormData(form);
+
+                    // Si hay una foto seleccionada y optimizada, sustituirla
+                    if (compressedEditPhoto) {
+                        formData.set('photo', compressedEditPhoto, compressedEditPhoto.name || 'player.webp');
+                    }
+
+                    const res = await fetch(`/api/players/${currentPlayer.id}`, {
+                        method: 'PUT',
+                        body: formData
+                    });
+
+                    const data = await res.json();
+                    if (res.ok && data.success && data.player) {
+                        currentPlayer = data.player;
+                        renderCarnet(currentPlayer);
+                        hideModal();
+                        showToast('¡Datos del carnet actualizados con éxito!');
+                    } else {
+                        alert(data.error || 'Error al actualizar el carnet.');
+                    }
+                } catch (err) {
+                    alert('Error de conexión al actualizar el carnet.');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<span>💾 Guardar Cambios</span>';
+                }
+            });
+        }
+
+        function showToast(msg) {
+            if (typeof alertify !== 'undefined') {
+                alertify.success(msg);
+                return;
+            }
+            const toast = document.getElementById('toastSuccess');
+            const toastMsg = document.getElementById('toastMsg');
+            toastMsg.textContent = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        function showError() {
+            document.getElementById('loadingBox').classList.add('hidden');
+            document.getElementById('errorBox').classList.remove('hidden');
+        }
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+
+        function renderSuspendedNotice(sub) {
+            const cleanPhone = (sub.contact_phone || '').replace(/\D/g, '');
+            const waUrl = cleanPhone ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent('Hola, me comunico para pagar la suscripción del torneo.')}` : null;
+            document.body.innerHTML = `
+                <div class="min-h-screen bg-slate-950 text-white flex flex-col justify-center items-center p-6 text-center">
+                    <div class="max-w-sm w-full bg-slate-900 border-2 border-rose-800 rounded-3xl p-6 shadow-2xl space-y-4">
+                        <div class="w-16 h-16 rounded-2xl bg-rose-950 border border-rose-600 text-rose-500 flex items-center justify-center text-3xl mx-auto shadow-lg animate-pulse">
+                            🔒
+                        </div>
+                        <span class="inline-block px-3 py-1 rounded-full bg-rose-950 text-rose-300 border border-rose-800 text-[10px] font-black uppercase tracking-wider">
+                            Servicio Suspendido
+                        </span>
+                        <h2 class="text-xl font-black text-white">${escapeHTML(sub.title || 'Suscripción Pendiente de Pago')}</h2>
+                        <p class="text-xs text-slate-300 leading-relaxed">${escapeHTML(sub.message || 'El acceso al carnet se encuentra temporalmente suspendido por falta de pago de la suscripción.')}</p>
+                        ${sub.payment_info ? `<div class="p-3 bg-amber-950/40 border border-amber-600/40 rounded-xl text-left text-xs font-mono text-amber-200 whitespace-pre-wrap">${escapeHTML(sub.payment_info)}</div>` : ''}
+                        ${waUrl ? `<a href="${waUrl}" target="_blank" class="block w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs py-3 px-4 rounded-xl shadow-lg transition">💬 Contactar por WhatsApp para Reactivación</a>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

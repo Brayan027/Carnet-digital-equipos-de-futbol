@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Inscripción Oficial de Jugador - Torneo de Fútbol</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- AlertifyJS CSS -->
+    <link rel="stylesheet" href="css/alertify.min.css">
+    <link rel="stylesheet" href="css/alertify-default.min.css">
+    <link rel="stylesheet" href="css/app.css">
+    <script src="js/alertify.min.js"></script>
+    <script src="js/alertify-config.js"></script>
+    <script src="js/image-compressor.js"></script>
+    <script src="js/html2canvas.min.js"></script>
+    <script src="js/carnet-downloader.js"></script>
+</head>
+<body class="bg-slate-100/60 text-slate-900 min-h-screen flex flex-col justify-between font-sans">
+
+    <!-- CABECERA BLANCA ELEGANTE -->
+    <header class="bg-white border-b border-slate-200/80 pt-5 pb-5 px-4 text-center shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
+        <div class="max-w-md mx-auto">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-900 text-white text-2xl shadow-md shadow-slate-900/10 mb-2">
+                ⚽
+            </div>
+            <h1 id="trnNameTitle" class="text-lg font-black uppercase tracking-wider text-slate-900">TORNEO SAN ANTONIO</h1>
+            <p class="text-xs text-emerald-700 font-extrabold tracking-wide mt-0.5">FICHA OFICIAL DE INSCRIPCIÓN DE JUGADOR</p>
+            
+            <div class="mt-3">
+                <a href="/buscar.html" class="inline-flex items-center gap-1.5 text-xs bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-3 py-1.5 rounded-full border border-slate-200 transition">
+                    <span>🔍</span>
+                    <span>¿Ya te inscribiste? Busca y descarga tu carnet aquí →</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- FORMULARIO MÓVIL PRINCIPAL (BLANCO & ELEGANTE) -->
+    <main class="flex-1 max-w-md w-full mx-auto px-4 py-6">
+        <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-6 sm:p-7 border border-slate-200/90">
+            
+            <form id="publicRegisterForm" class="space-y-4" enctype="multipart/form-data">
+                
+                <!-- SELECCIÓN DE EQUIPO -->
+                <div>
+                    <label class="block text-xs font-black text-slate-800 uppercase tracking-wide mb-1.5">
+                        1. Selecciona tu Equipo *
+                    </label>
+                    <select id="teamSelect" name="team_id" required class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm font-bold bg-slate-50 text-slate-900 focus:bg-white focus:border-slate-900 focus:outline-none transition">
+                        <option value="">-- Toca para elegir equipo --</option>
+                    </select>
+                </div>
+
+                <!-- NOMBRE COMPLETO -->
+                <div>
+                    <label class="block text-xs font-black text-slate-800 uppercase tracking-wide mb-1.5">
+                        2. Nombre Completo *
+                    </label>
+                    <input type="text" id="fullNameInput" name="full_name" required placeholder="Ej. Manuel Burgos" class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm font-semibold focus:border-slate-900 focus:outline-none transition">
+                </div>
+
+                <!-- SUBIDA DE FOTO DEL JUGADOR -->
+                <div>
+                    <label class="block text-xs font-black text-slate-800 uppercase tracking-wide mb-1.5">
+                        3. Foto para tu Carnet *
+                    </label>
+                    
+                    <div class="flex items-center gap-4 bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
+                        <!-- Vista previa -->
+                        <div class="w-20 h-24 rounded-xl bg-white border-2 border-slate-900 overflow-hidden flex items-center justify-center flex-shrink-0 shadow-sm relative">
+                            <img id="photoPreview" class="w-full h-full object-cover hidden" alt="Vista previa">
+                            <span id="photoPlaceholder" class="text-[10px] text-slate-400 text-center font-bold px-1">Sin Foto</span>
+                        </div>
+
+                        <!-- Botón de cámara / galería -->
+                        <div class="flex-1 space-y-1.5">
+                            <label class="cursor-pointer flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 px-3 rounded-xl text-xs shadow-md shadow-slate-900/10 active:scale-95 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                <span>Tomar o Elegir Foto</span>
+                                <input type="file" id="photoFileInput" name="photo" accept="image/*" capture="user" class="hidden" required>
+                            </label>
+                            <p class="text-[11px] text-slate-500 leading-tight">Foto tipo carnet, rostro centrado y visible.</p>
+                            <!-- Indicador de optimización en tiempo real -->
+                            <div id="photoOptimizedBadge" class="hidden flex items-center gap-1.5 text-[10px] text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 font-bold">
+                                <span>⚡</span>
+                                <span id="photoOptimizedText">Optimizada para envío instantáneo</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DOCUMENTO Y DORSAL -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-black text-slate-800 uppercase tracking-wide mb-1.5">
+                            Cédula / DNI
+                        </label>
+                        <input type="text" id="docNumberInput" name="document_number" placeholder="Ej. 1045..." class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:border-slate-900 focus:outline-none transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-black text-slate-800 uppercase tracking-wide mb-1.5">
+                            Dorsal / Camiseta
+                        </label>
+                        <input type="text" id="dorsalInput" name="dorsal" placeholder="Ej. 10" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:border-slate-900 focus:outline-none transition">
+                    </div>
+                </div>
+
+                <!-- POSICIÓN Y TELÉFONO -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-black text-slate-800 uppercase tracking-wide mb-1.5">
+                            Posición
+                        </label>
+                        <select name="position" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-semibold bg-white focus:border-slate-900 focus:outline-none transition">
+                            <option value="Delantero">Delantero</option>
+                            <option value="Mediocampista">Mediocampista</option>
+                            <option value="Defensa">Defensa</option>
+                            <option value="Portero">Portero</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-black text-slate-800 uppercase tracking-wide mb-1.5">
+                            Teléfono
+                        </label>
+                        <input type="tel" name="phone" placeholder="Ej. 300..." class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:border-slate-900 focus:outline-none transition">
+                    </div>
+                </div>
+
+                <!-- BOTÓN DE ENVÍO ELEGANTE -->
+                <div class="pt-3">
+                    <button type="submit" id="btnSubmit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-3.5 px-4 rounded-2xl text-sm shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 active:scale-[0.98] transition">
+                        <span>⚽ Enviar Inscripción al Torneo</span>
+                    </button>
+                </div>
+            </form>
+
+            <!-- MENSAJE DE ÉXITO Y DESCARGA INMEDIATA DE CARNET -->
+            <div id="successCard" class="hidden py-1 space-y-4 animate-fadeIn">
+                <div class="text-center space-y-1">
+                    <div class="w-12 h-12 bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-full flex items-center justify-center text-xl mx-auto shadow-sm">
+                        ✓
+                    </div>
+                    <h3 class="text-base font-black text-slate-900">¡Inscripción Exitosa!</h3>
+                    <p class="text-[11px] text-slate-500 max-w-xs mx-auto">
+                        Tu credencial oficial ha sido generada. Descarga tu carnet en imagen JPG ahora mismo o consúltalo en digital.
+                    </p>
+                </div>
+
+                <!-- CONTENEDOR DE LA TARJETA DEL CARNET GENERADO -->
+                <div id="successCarnetContainer" class="w-full">
+                    <!-- Se inyecta la tarjeta oficial del carnet -->
+                </div>
+
+                <!-- BOTONES DE ACCIÓN INMEDIATA -->
+                <div class="space-y-2 pt-1">
+                    <!-- 1. Botón Principal: Descargar JPG -->
+                    <button type="button" id="btnDownloadSuccessJpg" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-3.5 px-4 rounded-2xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 active:scale-[0.98] transition">
+                        <span class="text-base">📥</span>
+                        <span>Descargar Carnet (Formato JPG)</span>
+                    </button>
+
+                    <div class="flex gap-2">
+                        <!-- 2. Botón Ver Carnet Digital -->
+                        <a id="btnViewDigitalSuccess" href="#" target="_blank" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-3 rounded-2xl text-xs flex items-center justify-center gap-1.5 shadow-md shadow-slate-900/10 active:scale-[0.98] transition text-center">
+                            <span>👁️</span>
+                            <span>Ver Digital</span>
+                        </a>
+
+                        <!-- 3. Botón Compartir WhatsApp -->
+                        <a id="btnShareSuccessWa" href="#" target="_blank" class="flex-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 font-bold py-3 px-3 rounded-2xl text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-[0.98] transition text-center">
+                            <span>💬</span>
+                            <span>WhatsApp</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- RECORDATORIO AMIGABLE: CONSULTAR EN CUALQUIER MOMENTO -->
+                <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-3.5 text-center space-y-1">
+                    <p class="text-[11px] font-bold text-slate-700">
+                        💡 ¿Necesitas tu carnet más adelante?
+                    </p>
+                    <p class="text-[10px] text-slate-500 leading-relaxed">
+                        Podrás buscarlo y volver a descargarlo cuando quieras con tu <strong class="text-slate-800">Cédula o Nombre</strong> en el buscador oficial.
+                    </p>
+                    <div class="pt-1">
+                        <a href="/buscar.html" class="text-[11px] font-extrabold text-emerald-700 hover:underline">
+                            Ir al Buscador Oficial de Carnets →
+                        </a>
+                    </div>
+                </div>
+
+                <div class="text-center pt-1 border-t border-slate-100">
+                    <button type="button" onclick="location.reload()" class="text-xs font-bold text-slate-500 hover:text-slate-900 py-1.5 px-4 transition">
+                        + Inscribir a otro jugador
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="text-center py-3 text-[11px] text-slate-400">
+        Sistema Oficial de Carnetización y Verificación &bull; Versión Móvil
+    </footer>
+
+    <!-- SCRIPT DE REGISTRO MÓVIL -->
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Verificar si el sistema está suspendido por falta de pago
+            try {
+                const subRes = await fetch('/api/subscription/status');
+                if (subRes.ok) {
+                    const sub = await subRes.json();
+                    if (sub.is_blocked === 1 && sub.block_mode === 'TOTAL') {
+                        renderSuspendedNotice(sub);
+                        return;
+                    }
+                }
+            } catch (_) {}
+
+            try {
+                const trnRes = await fetch('/api/tournament');
+                if (trnRes.ok) {
+                    const data = await trnRes.json();
+                    if (data.tournament && data.tournament.name) {
+                        document.getElementById('trnNameTitle').textContent = data.tournament.name;
+                    }
+                }
+            } catch (e) {}
+
+            try {
+                const teamsRes = await fetch('/api/teams');
+                const { teams } = await teamsRes.json();
+                const select = document.getElementById('teamSelect');
+                if (teams && teams.length > 0) {
+                    teams.forEach(t => {
+                        const opt = document.createElement('option');
+                        opt.value = t.id;
+                        opt.textContent = t.name;
+                        select.appendChild(opt);
+                    });
+                }
+            } catch (e) {
+                console.error('Error cargando equipos:', e);
+            }
+
+            const photoInput = document.getElementById('photoFileInput');
+            const photoPreview = document.getElementById('photoPreview');
+            const photoPlaceholder = document.getElementById('photoPlaceholder');
+            const photoOptimizedBadge = document.getElementById('photoOptimizedBadge');
+            const photoOptimizedText = document.getElementById('photoOptimizedText');
+
+            let compressedPhotoFile = null;
+
+            photoInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                // Mostrar previsualización preliminar de inmediato
+                photoPreview.src = URL.createObjectURL(file);
+                photoPreview.classList.remove('hidden');
+                photoPlaceholder.classList.add('hidden');
+
+                if (photoOptimizedBadge) {
+                    photoOptimizedBadge.classList.remove('hidden');
+                    photoOptimizedText.textContent = 'Renderizando y optimizando foto...';
+                }
+
+                try {
+                    // Pre-renderizado y compresión en el navegador con Canvas (máx 700x850, calidad 82%)
+                    compressedPhotoFile = await ImageCompressor.compress(file, {
+                        maxWidth: 700,
+                        maxHeight: 850,
+                        quality: 0.82
+                    });
+
+                    // Actualizar vista previa con la versión optimizada final
+                    photoPreview.src = URL.createObjectURL(compressedPhotoFile);
+
+                    if (compressedPhotoFile._compressionMeta && photoOptimizedText) {
+                        const { originalSizeKB, compressedSizeKB, savingPct } = compressedPhotoFile._compressionMeta;
+                        photoOptimizedText.textContent = `Lista: ${compressedSizeKB} KB (Ahorro ${savingPct}%)`;
+                    } else if (photoOptimizedText) {
+                        photoOptimizedText.textContent = 'Foto optimizada lista para enviar';
+                    }
+                } catch (err) {
+                    console.warn('Error en pre-renderizado cliente:', err);
+                    compressedPhotoFile = file;
+                }
+            });
+
+            const form = document.getElementById('publicRegisterForm');
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = document.getElementById('btnSubmit');
+                btn.disabled = true;
+                btn.innerHTML = `<span class="animate-spin inline-block mr-2">🔄</span> Enviando ficha...`;
+
+                const formData = new FormData(form);
+
+                // Si la foto no se comprimió previamente, comprimirla ahora mismo antes de enviar
+                if (!compressedPhotoFile) {
+                    const rawPhoto = formData.get('photo');
+                    if (rawPhoto && rawPhoto.size > 0) {
+                        try {
+                            compressedPhotoFile = await ImageCompressor.compress(rawPhoto, {
+                                maxWidth: 700,
+                                maxHeight: 850,
+                                quality: 0.82
+                            });
+                        } catch (err) {
+                            compressedPhotoFile = rawPhoto;
+                        }
+                    }
+                }
+
+                if (compressedPhotoFile) {
+                    formData.set('photo', compressedPhotoFile, compressedPhotoFile.name || 'player.webp');
+                }
+
+                try {
+                    const res = await fetch('/api/players/public-register', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await res.json();
+                    if (res.ok && result.success) {
+                        form.classList.add('hidden');
+
+                        const p = result.player || {
+                            full_name: formData.get('full_name'),
+                            document_type: formData.get('document_type') || 'CC',
+                            document_number: formData.get('document_number'),
+                            dorsal: formData.get('dorsal'),
+                            position: formData.get('position'),
+                            qr_code_token: result.token,
+                            status: 'PENDING'
+                        };
+
+                        // Renderizar tarjeta del carnet oficial
+                        const container = document.getElementById('successCarnetContainer');
+                        container.innerHTML = CarnetDownloader.renderCardHtml(p, 'regSuccessCarnetCard');
+
+                        // Configurar enlace para ver carnet digital
+                        const carnetUrl = `${window.location.origin}/carnet.html?token=${encodeURIComponent(result.token || p.qr_code_token)}`;
+                        const btnView = document.getElementById('btnViewDigitalSuccess');
+                        btnView.href = carnetUrl;
+
+                        // Configurar botón compartir WhatsApp
+                        const waText = encodeURIComponent(`¡Hola! Ya completé mi registro oficial de jugador para ${p.tournament_name || 'el Torneo'} (${p.team_name || 'Sin Equipo'}). Puedes ver mi carnet aquí: ${carnetUrl}`);
+                        const btnWa = document.getElementById('btnShareSuccessWa');
+                        btnWa.href = `https://wa.me/?text=${waText}`;
+
+                        // Configurar botón de descarga en formato JPG
+                        const btnDownload = document.getElementById('btnDownloadSuccessJpg');
+                        btnDownload.onclick = async () => {
+                            const cardEl = document.getElementById('regSuccessCarnetCard');
+                            const cleanName = (p.full_name || 'Jugador').trim().replace(/\s+/g, '_');
+                            const cleanTeam = (p.team_name || 'Torneo').trim().replace(/\s+/g, '_');
+                            const filename = `Carnet_${cleanName}_${cleanTeam}.jpg`;
+                            await CarnetDownloader.downloadAsJpg(cardEl, filename, btnDownload);
+                        };
+
+                        document.getElementById('successCard').classList.remove('hidden');
+                    } else {
+                        alert(result.error || 'Ocurrió un error al enviar el registro.');
+                        btn.disabled = false;
+                        btn.innerHTML = `<span>⚽ Enviar Inscripción al Torneo</span>`;
+                    }
+                } catch (err) {
+                    alert('Error de conexión: ' + err.message);
+                    btn.disabled = false;
+                    btn.innerHTML = `<span>⚽ Enviar Inscripción al Torneo</span>`;
+                }
+            });
+        });
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+
+        function renderSuspendedNotice(sub) {
+            const cleanPhone = (sub.contact_phone || '').replace(/\D/g, '');
+            const waUrl = cleanPhone ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent('Hola, me comunico para pagar la suscripción del torneo.')}` : null;
+            document.body.innerHTML = `
+                <div class="min-h-screen bg-slate-950 text-white flex flex-col justify-center items-center p-6 text-center">
+                    <div class="max-w-md w-full bg-slate-900 border-2 border-rose-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-4">
+                        <div class="w-16 h-16 rounded-2xl bg-rose-950 border border-rose-600 text-rose-500 flex items-center justify-center text-3xl mx-auto shadow-lg animate-pulse">
+                            🔒
+                        </div>
+                        <span class="inline-block px-3 py-1 rounded-full bg-rose-950 text-rose-300 border border-rose-800 text-[10px] font-black uppercase tracking-wider">
+                            Inscripciones Suspendidas
+                        </span>
+                        <h2 class="text-xl font-black text-white">${escapeHTML(sub.title || 'Suscripción Pendiente de Pago')}</h2>
+                        <p class="text-xs text-slate-300 leading-relaxed">${escapeHTML(sub.message || 'El formulario de inscripción se encuentra temporalmente inhabilitado por falta de pago de la suscripción.')}</p>
+                        ${sub.payment_info ? `<div class="p-3 bg-amber-950/40 border border-amber-600/40 rounded-xl text-left text-xs font-mono text-amber-200 whitespace-pre-wrap">${escapeHTML(sub.payment_info)}</div>` : ''}
+                        ${waUrl ? `<a href="${waUrl}" target="_blank" class="block w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs py-3.5 px-4 rounded-xl shadow-lg transition">💬 Contactar por WhatsApp para Reactivación</a>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

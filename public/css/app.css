@@ -1,0 +1,539 @@
+/* ========================================================
+   ESTILOS PREMIUM - FONDO BLANCO & ELEGANTE (MOBILE-FIRST)
+   ======================================================== */
+
+:root {
+    --primary: #0f172a;
+    --primary-light: #1e293b;
+    --accent-emerald: #059669;
+    --accent-gold: #d97706;
+    --bg-page: #ffffff;
+    --surface: #ffffff;
+    --border-light: #e2e8f0;
+    --card-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f8fafc;
+    background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+    background-size: 24px 24px;
+    color: #0f172a;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+}
+
+/* ========================================================
+   DISEÑO EXACTO DEL CARNET DE FÚTBOL (ELEGANTE & NÍTIDO)
+   ======================================================== */
+
+.carnets-sheet {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 16px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+@media (min-width: 640px) {
+    .carnets-sheet {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .carnets-sheet {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+}
+
+/* Tarjeta individual de Carnet Digital */
+.carnet-card {
+    background: #ffffff;
+    border: 1.5px solid #0f172a;
+    border-radius: 14px;
+    box-shadow: var(--card-shadow);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    height: 172px;
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.carnet-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.1);
+}
+
+/* Cabecera con textura de mármol/piedra pulida y elegante */
+.carnet-header {
+    height: 42px;
+    background-color: #f1f5f9;
+    background-image: 
+        radial-gradient(ellipse at 20% 40%, rgba(255,255,255,0.9) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 60%, rgba(226,232,240,0.7) 0%, transparent 70%),
+        linear-gradient(135deg, #f8fafc 0%, #e2e8f0 40%, #ffffff 60%, #cbd5e1 100%);
+    border-bottom: 1.5px solid #0f172a;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    gap: 8px;
+    position: relative;
+    flex-shrink: 0;
+}
+
+/* Textura veteada de mármol sutil */
+.carnet-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.03 0.12' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.15 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.6'/%3E%3C/svg%3E");
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+/* Escudo o Logo en la cabecera */
+.carnet-shield {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));
+}
+
+.carnet-shield img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Nombre del Torneo */
+.carnet-tournament-title {
+    font-size: 13.5px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #0f172a;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
+    z-index: 1;
+    font-family: 'Arial Black', Impact, 'Segoe UI Black', sans-serif;
+}
+
+/* Cuerpo de la tarjeta */
+.carnet-body {
+    display: flex;
+    flex: 1;
+    padding: 8px 10px;
+    gap: 10px;
+    align-items: center;
+    background: #ffffff;
+    position: relative;
+}
+
+/* Contenedor de la foto */
+.carnet-photo-container {
+    width: 86px;
+    height: 104px;
+    flex-shrink: 0;
+    border: 1.5px solid #0f172a;
+    border-radius: 8px;
+    background: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.carnet-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Información del jugador */
+.carnet-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 7px;
+    overflow: hidden;
+    padding-right: 52px; /* Espacio para el código QR */
+}
+
+/* Fila de Equipo */
+.carnet-team-row {
+    font-size: 12.5px;
+    line-height: 1.2;
+    color: #0f172a;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.carnet-team-label {
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.carnet-team-name {
+    font-weight: 700;
+    color: #0f172a;
+}
+
+/* Fila de Nombre */
+.carnet-name-block {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.carnet-name-label {
+    font-size: 11.5px;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: #0f172a;
+}
+
+.carnet-player-name {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.25;
+    word-break: break-word;
+}
+
+/* Código QR en la esquina del carnet */
+.carnet-qr-box {
+    position: absolute;
+    right: 9px;
+    bottom: 9px;
+    width: 50px;
+    height: 50px;
+    background: #ffffff;
+    border: 1px solid #0f172a;
+    border-radius: 6px;
+    padding: 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    transition: transform 0.15s ease;
+}
+
+.carnet-qr-box:hover {
+    transform: scale(1.08);
+}
+
+.carnet-qr-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.carnet-qr-label {
+    font-size: 6.5px;
+    font-weight: 900;
+    text-align: center;
+    line-height: 1;
+    color: #0f172a;
+    margin-top: 1px;
+}
+
+/* Animaciones suaves */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ========================================================
+   ALERTIFYJS - DISEÑO MODERNO Y ELEGANTE
+   ======================================================== */
+.alertify .ajs-dimmer {
+    background-color: rgba(15, 23, 42, 0.55) !important;
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+    opacity: 1 !important;
+}
+
+.alertify .ajs-dialog {
+    background: #ffffff !important;
+    border-radius: 1.25rem !important;
+    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(15, 23, 42, 0.08) !important;
+    border: none !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    max-width: 440px !important;
+    margin: 8% auto !important;
+}
+
+.alertify .ajs-header {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 1rem !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.02em;
+    padding: 1.25rem 1.5rem 0.5rem 1.5rem !important;
+    margin: 0 !important;
+    border-bottom: none !important;
+}
+
+.alertify .ajs-body {
+    padding: 0.5rem 1.5rem 1.25rem 1.5rem !important;
+    color: #475569 !important;
+    font-size: 0.875rem !important;
+    line-height: 1.5 !important;
+    font-weight: 500 !important;
+}
+
+.alertify .ajs-body .ajs-content {
+    padding: 0 !important;
+}
+
+.alertify .ajs-footer {
+    background: #f8fafc !important;
+    border-top: 1px solid #f1f5f9 !important;
+    padding: 0.875rem 1.25rem !important;
+    margin: 0 !important;
+}
+
+.alertify .ajs-footer .ajs-buttons.ajs-primary {
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 0.5rem !important;
+}
+
+.alertify .ajs-footer .ajs-buttons .ajs-button {
+    font-family: inherit !important;
+    font-size: 0.8125rem !important;
+    font-weight: 700 !important;
+    padding: 0.5rem 1.25rem !important;
+    border-radius: 0.75rem !important;
+    min-height: 38px !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease-in-out !important;
+    text-transform: none !important;
+    border: 1px solid transparent !important;
+    outline: none !important;
+}
+
+/* Botón OK / Confirmar */
+.alertify .ajs-footer .ajs-buttons .ajs-button.ajs-ok {
+    background-color: #0f172a !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.1) !important;
+}
+.alertify .ajs-footer .ajs-buttons .ajs-button.ajs-ok:hover {
+    background-color: #1e293b !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Botón Cancelar */
+.alertify .ajs-footer .ajs-buttons .ajs-button.ajs-cancel {
+    background-color: #ffffff !important;
+    color: #64748b !important;
+    border: 1px solid #cbd5e1 !important;
+}
+.alertify .ajs-footer .ajs-buttons .ajs-button.ajs-cancel:hover {
+    background-color: #f1f5f9 !important;
+    color: #0f172a !important;
+}
+
+/* Notificaciones flotantes (Toasts) */
+.alertify-notifier {
+    z-index: 999999 !important;
+}
+
+.alertify-notifier .ajs-message {
+    border-radius: 1rem !important;
+    font-family: inherit !important;
+    font-size: 0.8125rem !important;
+    font-weight: 700 !important;
+    padding: 0.75rem 1.25rem !important;
+    box-shadow: 0 10px 25px -3px rgba(15, 23, 42, 0.15), 0 4px 6px -2px rgba(15, 23, 42, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    text-shadow: none !important;
+    line-height: 1.4 !important;
+    color: #ffffff !important;
+    width: auto !important;
+    min-width: 250px !important;
+    max-width: 400px !important;
+}
+
+.alertify-notifier .ajs-message.ajs-success {
+    background: #059669 !important; /* emerald-600 */
+}
+
+.alertify-notifier .ajs-message.ajs-error {
+    background: #e11d48 !important; /* rose-600 */
+}
+
+.alertify-notifier .ajs-message.ajs-warning {
+    background: #d97706 !important; /* amber-600 */
+    color: #ffffff !important;
+}
+
+/* ========================================================
+   ESTILOS DE IMPRESIÓN Y PDF HORIZONTAL (LANDSCAPE 3x4)
+   ======================================================== */
+@media print {
+    @page {
+        size: letter landscape;
+        margin: 6mm 6mm;
+    }
+
+    html, body {
+        background: #ffffff !important;
+        background-image: none !important;
+        color: #000000 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+    }
+
+    /* Ocultar elementos de interfaz no imprimibles */
+    #appSidebar,
+    #sidebarBackdrop,
+    header,
+    .no-print,
+    #tabPlayers,
+    #tabTeams,
+    #tabScanner,
+    #tabUsers,
+    #tabSettings,
+    #modalLogin,
+    #modalCarnet,
+    #modalPlayerForm,
+    #modalTeamForm,
+    #modalUserForm,
+    #modalShareRegister,
+    .alertify,
+    .alertify-notifier {
+        display: none !important;
+    }
+
+    main {
+        max-width: 100% !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    #tabCarnets {
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    #tabCarnets > div:first-child {
+        display: none !important; /* Oculta la barra de título y filtros */
+    }
+
+    #tabCarnets > div:last-child {
+        padding: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+    }
+
+    .carnets-sheet {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 3mm !important;
+        width: 100% !important;
+        margin: 0 auto !important;
+    }
+
+    .carnet-card, .bg-white.rounded-2xl.border-2 {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        border: 1px solid #000000 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        height: 48mm !important;
+        margin: 0 !important;
+        overflow: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: flex-start !important;
+        background: #ffffff !important;
+    }
+
+    /* Ocultar barra inferior de botones (token, editar, ver) */
+    .carnet-card > div.bg-slate-50,
+    .bg-white.rounded-2xl.border-2 > div.bg-slate-50 {
+        display: none !important;
+    }
+
+    /* Ocultar caja QR si se desea impresión pura como plantilla */
+    .carnet-qr-box {
+        display: none !important;
+    }
+
+    .carnet-header {
+        height: 26px !important;
+        border-radius: 0 !important;
+        border-bottom: 1px solid #000000 !important;
+        padding: 0 6px !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .carnet-body {
+        padding: 4px 6px !important;
+        gap: 8px !important;
+    }
+
+    .carnet-photo-container {
+        width: 76px !important;
+        height: 84px !important;
+        border: 1px solid #000000 !important;
+        border-radius: 0 !important;
+    }
+
+    .carnet-info {
+        padding-right: 0 !important;
+        gap: 4px !important;
+    }
+
+    .carnet-team-row {
+        font-size: 11px !important;
+    }
+
+    .carnet-name-label {
+        font-size: 11px !important;
+    }
+
+    .carnet-player-name {
+        font-size: 12px !important;
+    }
+}
+
+
